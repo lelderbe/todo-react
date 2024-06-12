@@ -32,6 +32,22 @@ export class Api {
     async getTasks(): Promise<ITask[]> {
         return this.request<ITask[]>('/tasks');
     }
+
+    async updateTask(id: string, body: Partial<ITask>): Promise<ITask> {
+        return this.request<ITask>(`/tasks/${id}`, {
+            method: 'PATCH',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(body),
+        });
+    }
+
+    async removeTask(id: string): Promise<boolean> {
+        return this.request<boolean>(`/tasks/${id}`, {
+            method: 'DELETE',
+        });
+    }
 }
 
 const api = new Api({
