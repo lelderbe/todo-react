@@ -1,10 +1,12 @@
-import { ITask } from '../types';
+import { ITask } from '../types/types';
 import { config } from './config';
 
 type TConfigApi = {
     baseUrl: string;
     headers: HeadersInit;
 };
+
+type TCreateTaskDto = Omit<ITask, 'id'>;
 
 export class Api {
     private baseUrl;
@@ -36,6 +38,16 @@ export class Api {
     async updateTask(id: string, body: Partial<ITask>): Promise<ITask> {
         return this.request<ITask>(`/tasks/${id}`, {
             method: 'PATCH',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(body),
+        });
+    }
+
+    async createTask(body: TCreateTaskDto): Promise<ITask> {
+        return this.request<ITask>('/tasks/', {
+            method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
             },
