@@ -1,33 +1,31 @@
 import { Box, Button, Container, Input, Typography } from '@mui/material';
 import { SyntheticEvent, useState, useEffect, ChangeEvent } from 'react';
-import api from '../../services/api';
+import api, { TCreateTaskDto, TUpdateTaskDto } from '../../services/api';
 import { ITask } from '../../types/types';
 
 interface Props {
-    getTasks: () => Promise<void>;
+    onCreateTask: (task: TCreateTaskDto) => Promise<void>;
+    onUpdateTask: (task: TUpdateTaskDto) => Promise<void>;
     editTask: ITask | null;
-    setEditTask: React.Dispatch<React.SetStateAction<ITask | null>>;
 }
 
-export const Header = ({ getTasks, editTask, setEditTask }: Props) => {
+export const Header = ({ editTask, onCreateTask, onUpdateTask }: Props) => {
     const [title, setTitle] = useState<ITask['title']>('');
 
     const handleChangeTitle = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         setTitle(e.target.value);
     };
 
-    const handleCreateTask = async (e: SyntheticEvent<HTMLFormElement>) => {
+    const handleCreateOrUpdateTask = async (e: SyntheticEvent<HTMLFormElement>) => {
         e.preventDefault();
         if (!title) {
             return;
         }
         if (editTask !== null) {
-            await api.updateTask(editTask.id, { title });
-            setEditTask(null);
+            onUpdateTask({ title });
         } else {
-            await api.createTask({ title, done: false });
+            onCreateTask({ title, done: false });
         }
-        getTasks();
         setTitle('');
     };
 
@@ -52,7 +50,7 @@ export const Header = ({ getTasks, editTask, setEditTask }: Props) => {
                     noValidate
                     autoComplete="off"
                     sx={{ display: 'flex', gap: '20px', alignItems: 'center' }}
-                    onSubmit={handleCreateTask}
+                    onSubmit={handleCreateOrUpdateTask}
                 >
                     <Typography>TODO:</Typography>
                     <Input name="title" fullWidth value={title} onChange={handleChangeTitle} />

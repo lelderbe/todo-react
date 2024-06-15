@@ -6,16 +6,16 @@ interface Props {
     tasks: ITask[];
     onEditTask: (task: ITask) => void;
     onRemoveTask: (id: string) => void;
-    onToggleTask: (id: string) => void;
+    onToggleTask: (task: ITask) => void;
 }
 
 export const Tasks = ({ tasks, onEditTask, onRemoveTask, onToggleTask }: Props) => {
     return (
-        <List sx={{ mt: '80px', bgcolor: 'background.paper' }}>
+        <List sx={{ bgcolor: 'background.paper' }}>
             {tasks.map((item) => (
                 <Task
                     key={item.id}
-                    {...item}
+                    task={item}
                     onRemoveTask={onRemoveTask}
                     onToggleTask={onToggleTask}
                     onEditTask={onEditTask}

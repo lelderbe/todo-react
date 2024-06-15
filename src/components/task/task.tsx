@@ -6,13 +6,16 @@ import ListItemButton from '@mui/material/ListItemButton';
 import ListItemText from '@mui/material/ListItemText';
 import EditIcon from '@mui/icons-material/Edit';
 
-type Props = ITask & {
+interface Props {
+    task: ITask;
     onRemoveTask: (id: string) => void;
-    onToggleTask: (id: string) => void;
+    onToggleTask: (task: ITask) => void;
     onEditTask: (task: ITask) => void;
-};
+}
 
-export const Task = ({ id, title, done, onRemoveTask, onToggleTask, onEditTask }: Props) => {
+export const Task = ({ task, onRemoveTask, onToggleTask, onEditTask }: Props) => {
+    const { id, title, done } = task;
+
     return (
         <ListItem
             key={id}
@@ -30,7 +33,7 @@ export const Task = ({ id, title, done, onRemoveTask, onToggleTask, onEditTask }
         >
             <ListItemButton
                 role={undefined}
-                onClick={() => onToggleTask(id)}
+                onClick={() => onToggleTask(task)}
                 dense
                 sx={{ paddingRight: '84px !important' }}
             >

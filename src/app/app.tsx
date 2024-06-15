@@ -3,18 +3,36 @@ import { Header } from '../components/header/header';
 import { Tasks } from '../components/tasks/tasks';
 import { Box, Container, CssBaseline } from '@mui/material';
 import { ITask } from '../types/types';
-import api from '../services/api';
+import api, { TCreateTaskDto, TUpdateTaskDto } from '../services/api';
+import { Loader } from '../components/loader/loader';
 
 export const App = () => {
     const [tasks, setTasks] = useState<ITask[]>([]);
     const [editTask, setEditTask] = useState<ITask | null>(null);
+    const [loading, setLoading] = useState<boolean>(true);
 
     const getTasks = async () => {
         try {
+            // setLoading(true);
             const data = await api.getTasks();
             setTasks(data.reverse());
         } catch (error) {
             console.error(error);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handleCreateTask = async (task: TCreateTaskDto) => {
+        await api.createTask(task);
+        getTasks();
+    };
+
+    const handleUpdateTask = async (task: TUpdateTaskDto) => {
+        if (editTask !== null) {
+            await api.updateTask(editTask.id, task);
+            setEditTask(null);
+            getTasks();
         }
     };
 
@@ -30,12 +48,9 @@ export const App = () => {
         getTasks();
     };
 
-    const handleToggleTask = async (id: string) => {
-        const task = tasks.find((item) => item.id === id);
-        if (task) {
-            await api.updateTask(id, { done: !task.done });
-            getTasks();
-        }
+    const handleToggleTask = async (task: ITask) => {
+        await api.updateTask(task.id, { done: !task.done });
+        getTasks();
     };
 
     useEffect(() => {
@@ -51,14 +66,22 @@ export const App = () => {
             }}
         >
             <CssBaseline />
-            <Header getTasks={getTasks} editTask={editTask} setEditTask={setEditTask} />
-            <Container component="main" maxWidth="sm" disableGutters sx={{ flex: '1' }}>
-                <Tasks
-                    tasks={tasks}
-                    onEditTask={handleEditTask}
-                    onRemoveTask={handleRemoveTask}
-                    onToggleTask={handleToggleTask}
-                />
+            <Header editTask={editTask} onCreateTask={handleCreateTask} onUpdateTask={handleUpdateTask} />
+            <Container
+                component="main"
+                maxWidth="sm"
+                disableGutters
+                sx={{ display: 'flex', pt: '80px', flexDirection: 'column', flex: '1' }}
+            >
+                {loading && <Loader />}
+                {!loading && (
+                    <Tasks
+                        tasks={tasks}
+                        onEditTask={handleEditTask}
+                        onRemoveTask={handleRemoveTask}
+                        onToggleTask={handleToggleTask}
+                    />
+                )}
             </Container>
         </Box>
     );

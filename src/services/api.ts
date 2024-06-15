@@ -6,7 +6,8 @@ type TConfigApi = {
     headers: HeadersInit;
 };
 
-type TCreateTaskDto = Omit<ITask, 'id'>;
+export type TCreateTaskDto = Omit<ITask, 'id'>;
+export type TUpdateTaskDto = Partial<Omit<ITask, 'id'>>;
 
 export class Api {
     private baseUrl;
