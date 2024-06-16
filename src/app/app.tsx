@@ -5,6 +5,8 @@ import { Box, Container, CssBaseline } from '@mui/material';
 import { ITask } from '../types/types';
 import api, { TCreateTaskDto, TUpdateTaskDto } from '../services/api';
 import { Loader } from '../components/loader/loader';
+import { toast } from 'react-toastify';
+import { getMessageFromError } from '../utils/error-utils';
 
 export const App = () => {
     const [tasks, setTasks] = useState<ITask[]>([]);
@@ -13,26 +15,33 @@ export const App = () => {
 
     const getTasks = async () => {
         try {
-            // setLoading(true);
             const data = await api.getTasks();
             setTasks(data.reverse());
         } catch (error) {
-            console.error(error);
+            toast.error(getMessageFromError(error, 'Неизвестная ошибка при получении списка задач, попробуйте позже'));
         } finally {
             setLoading(false);
         }
     };
 
     const handleCreateTask = async (task: TCreateTaskDto) => {
-        await api.createTask(task);
-        getTasks();
+        try {
+            await api.createTask(task);
+            getTasks();
+        } catch (error) {
+            toast.error(getMessageFromError(error, 'Неизвестная ошибка при создании задачи, попробуйте позже'));
+        }
     };
 
     const handleUpdateTask = async (task: TUpdateTaskDto) => {
-        if (editTask !== null) {
-            await api.updateTask(editTask.id, task);
-            setEditTask(null);
-            getTasks();
+        try {
+            if (editTask !== null) {
+                await api.updateTask(editTask.id, task);
+                setEditTask(null);
+                getTasks();
+            }
+        } catch (error) {
+            toast.error(getMessageFromError(error, 'Неизвестная ошибка при сохранении задачи, попробуйте позже'));
         }
     };
 
@@ -41,16 +50,24 @@ export const App = () => {
     };
 
     const handleRemoveTask = async (id: string) => {
-        await api.removeTask(id);
-        if (editTask?.id === id) {
-            setEditTask(null);
+        try {
+            await api.removeTask(id);
+            if (editTask?.id === id) {
+                setEditTask(null);
+            }
+            getTasks();
+        } catch (error) {
+            toast.error(getMessageFromError(error, 'Неизвестная ошибка при удалении задачи, попробуйте позже'));
         }
-        getTasks();
     };
 
     const handleToggleTask = async (task: ITask) => {
-        await api.updateTask(task.id, { done: !task.done });
-        getTasks();
+        try {
+            await api.updateTask(task.id, { done: !task.done });
+            getTasks();
+        } catch (error) {
+            toast.error(getMessageFromError(error, 'Неизвестная ошибка, попробуйте позже'));
+        }
     };
 
     useEffect(() => {

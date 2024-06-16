@@ -1,6 +1,6 @@
 import { Box, Button, Container, Input, Typography } from '@mui/material';
 import { SyntheticEvent, useState, useEffect, ChangeEvent } from 'react';
-import api, { TCreateTaskDto, TUpdateTaskDto } from '../../services/api';
+import { TCreateTaskDto, TUpdateTaskDto } from '../../services/api';
 import { ITask } from '../../types/types';
 
 interface Props {
